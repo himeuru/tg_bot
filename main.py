@@ -131,9 +131,5 @@ def callback(message):
         bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта')
 
 
-bot.polling()
-
-
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    bot.run(host='0.0.0.0', port=port)
+    bot.polling()
