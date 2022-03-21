@@ -7,7 +7,6 @@ from PIL import Image
 from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
-from restart import restart
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
@@ -34,7 +33,6 @@ def start(message):
         info.name, info_name = message.from_user.username, message.from_user.username
         db_sess.add(info)
         db_sess.commit()
-        # restart()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     photo_choose_button = types.KeyboardButton("фото")
     quiz_button = types.KeyboardButton("викторина")
