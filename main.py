@@ -53,7 +53,6 @@ def callback(message):
         info_name = params[1][1:-1]
         info_exp = params[2][1:-1]
         info_time = params[3][1:-2]
-        print(info_id, info_name, info_exp, info_time)
     if len(params) == 0:
         info.exp, info_exp = 0, 0
         info.daily_photo_time, info_time = str(datetime.now() - timedelta(days=1))[:-16], \
