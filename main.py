@@ -1,13 +1,13 @@
 import os
 import requests
-import telebot
 from datetime import datetime, timedelta
-from telebot import types
+from telebot import types, telebot
 from io import BytesIO
 from PIL import Image
 from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
+from restart import restart
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
@@ -34,6 +34,7 @@ def start(message):
         info.name, info_name = message.from_user.username, message.from_user.username
         db_sess.add(info)
         db_sess.commit()
+        # restart()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     photo_choose_button = types.KeyboardButton("фото")
     quiz_button = types.KeyboardButton("викторина")
@@ -79,12 +80,11 @@ def callback(message):
             sort_time = [str(time)[:-16].split('-'),  str(info_time).split('-')]
             res = sorted(sort_time, key=lambda x: (x[0], x[1], x[2]))
             if res[0] == str(info_time).split('-') and res[0] != res[1]:
-
                 info.daily_photo_time = str(time)[:-16]
-                info.id = info_id
                 info.name = info_name
                 info.exp = int(info_exp) + 5
-                db_sess.add(info)
+                db_sess.execute(f"""UPDATE information SET exp='{info.exp}', daily_photo_time='{info.daily_photo_time}' 
+                WHERE id='{info_id}'""")
                 db_sess.commit()
                 info_exp = info.exp
                 bot.send_message(message.chat.id, "вы получили 5 опыта")
@@ -111,7 +111,15 @@ def callback(message):
         image = Image.open(BytesIO(image_response.content))
         if image:
             print('image success')
-            bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
+            if len(explanation) > 1024:
+                for i in range(len(explanation), 0, -1):
+                    if str(explanation)[i - 1] == '.' and i <= 1000:
+                        explanation = explanation[:i]
+                        break
+                bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
+                               f'name: {title} \nexplanation: {explanation}')
+            else:
+                bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
                            f'name: {title} \nexplanation: {explanation}')
     elif message.text == '⬅назад':
         start(message)
@@ -124,3 +132,8 @@ def callback(message):
 
 
 bot.polling()
+
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    bot.run(host='0.0.0.0', port=port)
