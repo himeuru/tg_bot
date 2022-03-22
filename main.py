@@ -46,7 +46,6 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def callback(message):
     print('callback to:', message.chat.id)
-    print(message.text.lower() in _solar)
     global url_for_date, info_time, info_exp, info_id, info_name
     params = []
     for param in session.query(Info).filter(Info.id == message.chat.id):
@@ -208,7 +207,6 @@ def solar(message):
                                           "Нептун")
 
     if message.text.lower() in _solar:
-        print(123)
         for planet in _solar:
             if message.text.lower() == planet:
                 bot.send_photo(message.from_user.id, open(f'./images/solar_system/{planet}.jpg', 'rb'))
