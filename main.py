@@ -7,6 +7,7 @@ from PIL import Image
 from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
+from dictionaries import _comets, _nebulae, _solar, _stars, _satellites
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
@@ -61,7 +62,7 @@ def callback(message):
         info.name, info_name = message.from_user.username, message.from_user.username
         db_sess.add(info)
         db_sess.commit()
-    if message.text == 'фото':
+    elif message.text == 'фото':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         today_button = types.KeyboardButton("фото дня")
         yesterday_button = types.KeyboardButton('вчерашнее фото дня')
@@ -123,9 +124,136 @@ def callback(message):
     elif message.text == 'викторина':
         bot.send_message(message.chat.id, 'в разработке')
     elif message.text == 'альбом':
-        bot.send_message(message.chat.id, 'в разработке')
+        album(message)
     elif message.text == 'мой опыт':
         bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта')
+
+    elif message.text == 'кометы' or str(message.text).lower() in _comets:
+        comets(message)
+    elif message.text == 'туманности' or str(message.text).lower() in _nebulae:
+        nebulae(message)
+    elif message.text == 'спутники' or str(message.text).lower() in _satellites:
+        satellites(message)
+    elif message.text == 'солнечная система' or str(message.text).lower() in _solar:
+        solar(message)
+    elif message.text == 'звёзды' or str(message.text).lower() in _stars:
+        stars(message)
+    elif message.text == '⬅назад':
+        callback()
+
+
+def album(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    comets_button = types.KeyboardButton("кометы")
+    nebulae_button = types.KeyboardButton("туманности")
+    satellites_button = types.KeyboardButton("спутники")
+    solar_system_button = types.KeyboardButton("солнечная система")
+    stars_button = types.KeyboardButton("звёзды")
+    back_button = types.KeyboardButton("⬅назад")
+    markup.add(comets_button, nebulae_button, satellites_button, solar_system_button, stars_button, back_button)
+    bot.send_message(message.chat.id, "выберите кнопку", reply_markup=markup)
+
+
+def comets(message):
+    if message.text == 'кометы':
+        bot.send_message(message.chat.id, "список комет: \n"
+                                          "Комета Чурюмова — Герасименко\n"
+                                          "Комета Хейла — Боппа\n"
+                                          "Комета Галлея\n"
+                                          "Комета Холмса\n"
+                                          "Комета Лавджоя\n"
+                                          "Комета Темпеля\n"
+                                          "Комета Вильда")
+    if (str(message.text).split()[0]).lower() == 'комета':
+        for comet in _comets:
+            if message.text.lower() == comet:
+                bot.send_photo(message.from_user.id, open(f'./images/comets/{comet}.jpg', 'rb'))
+
+
+def nebulae(message):
+    if message.text == 'туманности':
+        bot.send_message(message.chat.id, "список туманностей: \n"
+                                          "Биполярная туманность\n"
+                                          "Мерцающая туманность\n"
+                                          "Туманность бабочка\n"
+                                          "Туманность гантель\n"
+                                          "Туманность кольцо\n"
+                                          "Туманность кошачий глаз\n"
+                                          "Туманность маленькая гантель\n"
+                                          "Туманность медуза\n"
+                                          "Туманность призрак Юпитера\n"
+                                          "Туманность призрак\n"
+                                          "Туманность светящийся глаз\n"
+                                          "Туманность сова\n"
+                                          "Туманность улитка\n"
+                                          "Туманность череп\n"
+                                          "Туманность Эскимос")
+    if (str(message.text).split()[0]).lower() == 'туманность':
+        for nebula in _nebulae:
+            if message.text.lower() == nebula:
+                bot.send_photo(message.from_user.id, open(f'./images/nebulae/{nebula}.jpg', 'rb'))
+
+
+def solar(message):
+    if message.text == 'солнечная система':
+        bot.send_message(message.chat.id, "список планет солнечной системы:\n"
+                                          "Меркурий\n"
+                                          "Венера\n"
+                                          "Земля\n"
+                                          "Марс\n"
+                                          "Юпитер\n"
+                                          "Сатурн\n"
+                                          "Уран\n"
+                                          "Нептун")
+
+    if str(message.text).lower() in _solar:
+        for planet in _solar:
+            if message.text == planet:
+                bot.send_photo(message.from_user.id, open(f'./images/solar_system/{planet}.jpg', 'rb'))
+
+
+def stars(message):
+    if message.text == 'звёзды':
+        bot.send_message(message.chat.id, 'звёзды:\n'
+                                          'эридана\n'
+                                          'ez водолея\n'
+                                          'глизе 832\n'
+                                          'глизе 876\n'
+                                          'lhs 288\n'
+                                          'процион\n'
+                                          'солнце\n'
+                                          'сириус\n'
+                                          'проксима центавра')
+    if str(message.text).lower() in _stars:
+        for star in _stars:
+            if message.text.lower() == star:
+                bot.send_photo(message.from_user.id, open(f'./images/stars/{star}.jpg', 'rb'))
+
+
+def satellites(message):
+    if message.text == 'спутники':
+        bot.send_message(message.chat.id, 'спутники:\n'
+                                          'Земли: Луна\n'
+                                          '\n'
+                                          'Марса: Деймос, Фобос\n'
+                                          '\n'
+                                          'Юпитера: Амальтея, Ананке, Ганимед, Гималия, Европа\n'
+                                          'Ио, Каллисто, Карме, Леда, Лиситея, Пасифе, Синопе, Элара\n'
+                                          'Сатурна: Титан, Япет, Рея, Тефия, Диона, Энцелад, Мимас\n'
+                                          'Гиперион, Феба, Янус, Эпиметей\n'
+                                          '\n'
+                                          'Урана: Титания, Оберон, Ариэль, Умбриэль, Миранда, Пак\n'
+                                          'Джульетта, Порция, Крессида, Дездемона, Розалинда, Белинда\n'
+                                          'Корделия, Офелия, Бианка, Калибан, Сикоракса, Пердита, Сетебос\n'
+                                          'Стефано, Просперо, Фердинанд, Маб, Купидон, Маргарита\n'
+                                          '\n'
+                                          'Нептуна: Тритон, Нереида, Ларисса, Протей, Деспина, Галатея\n'
+                                          'Таласса, Наяда, Галимеда, Псамафа')
+
+    if str(message.text).lower() in _satellites:
+        for satellite in _satellites:
+            if message.text.lower() == satellite:
+                bot.send_photo(message.from_user.id, open(f'./images/satellites/{satellite}.jpg', 'rb'))
 
 
 if __name__ == '__main__':
