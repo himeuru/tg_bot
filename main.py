@@ -46,6 +46,7 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def callback(message):
     print('callback to:', message.chat.id)
+    print(message.text.lower() in _solar)
     global url_for_date, info_time, info_exp, info_id, info_name
     params = []
     for param in session.query(Info).filter(Info.id == message.chat.id):
@@ -128,15 +129,15 @@ def callback(message):
     elif message.text == 'мой опыт':
         bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта')
 
-    elif message.text == 'кометы' or str(message.text).lower() in _comets:
+    elif message.text == 'кометы' or message.text.lower() in _comets:
         comets(message)
-    elif message.text == 'туманности' or str(message.text).lower() in _nebulae:
+    elif message.text == 'туманности' or message.text.lower() in _nebulae:
         nebulae(message)
-    elif message.text == 'спутники' or str(message.text).lower() in _satellites:
+    elif message.text == 'спутники' or message.text.lower() in _satellites:
         satellites(message)
-    elif message.text == 'солнечная система' or str(message.text).lower() in _solar:
+    elif message.text == 'солнечная система' or message.text.lower() in _solar:
         solar(message)
-    elif message.text == 'звёзды' or str(message.text).lower() in _stars:
+    elif message.text == 'звёзды' or message.text.lower() in _stars:
         stars(message)
     elif message.text == '⬅назад':
         callback()
@@ -206,14 +207,15 @@ def solar(message):
                                           "Уран\n"
                                           "Нептун")
 
-    if str(message.text).lower() in _solar:
+    if message.text.lower() in _solar:
+        print(123)
         for planet in _solar:
-            if message.text == planet:
+            if message.text.lower() == planet:
                 bot.send_photo(message.from_user.id, open(f'./images/solar_system/{planet}.jpg', 'rb'))
 
 
 def stars(message):
-    if message.text == 'звёзды':
+    if message.text.lower() == 'звёзды':
         bot.send_message(message.chat.id, 'звёзды:\n'
                                           'эридана\n'
                                           'ez водолея\n'
@@ -224,7 +226,7 @@ def stars(message):
                                           'солнце\n'
                                           'сириус\n'
                                           'проксима центавра')
-    if str(message.text).lower() in _stars:
+    if message.text.lower() in _stars:
         for star in _stars:
             if message.text.lower() == star:
                 bot.send_photo(message.from_user.id, open(f'./images/stars/{star}.jpg', 'rb'))
@@ -250,7 +252,7 @@ def satellites(message):
                                           'Нептуна: Тритон, Нереида, Ларисса, Протей, Деспина, Галатея\n'
                                           'Таласса, Наяда, Галимеда, Псамафа')
 
-    if str(message.text).lower() in _satellites:
+    if message.text.lower() in _satellites:
         for satellite in _satellites:
             if message.text.lower() == satellite:
                 bot.send_photo(message.from_user.id, open(f'./images/satellites/{satellite}.jpg', 'rb'))
