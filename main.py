@@ -138,8 +138,6 @@ def callback(message):
         solar(message)
     elif message.text == 'звёзды' or message.text.lower() in _stars:
         stars(message)
-    elif message.text == '⬅назад':
-        callback()
 
 
 def album(message):
@@ -149,8 +147,7 @@ def album(message):
     satellites_button = types.KeyboardButton("спутники")
     solar_system_button = types.KeyboardButton("солнечная система")
     stars_button = types.KeyboardButton("звёзды")
-    back_button = types.KeyboardButton("⬅назад")
-    markup.add(comets_button, nebulae_button, satellites_button, solar_system_button, stars_button, back_button)
+    markup.add(comets_button, nebulae_button, satellites_button, solar_system_button, stars_button)
     bot.send_message(message.chat.id, "выберите кнопку", reply_markup=markup)
 
 
