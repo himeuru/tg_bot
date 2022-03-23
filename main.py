@@ -147,7 +147,8 @@ def album(message):
     satellites_button = types.KeyboardButton("спутники")
     solar_system_button = types.KeyboardButton("солнечная система")
     stars_button = types.KeyboardButton("звёзды")
-    markup.add(comets_button, nebulae_button, satellites_button, solar_system_button, stars_button)
+    back_button = types.KeyboardButton('⬅назад')
+    markup.add(comets_button, nebulae_button, satellites_button, solar_system_button, stars_button, back_button)
     bot.send_message(message.chat.id, "выберите кнопку", reply_markup=markup)
 
 
