@@ -109,7 +109,7 @@ def callback(message):
         image = Image.open(BytesIO(image_response.content))
         if image:
             print('image success')
-            if len(explanation) > 1024:
+            if len(explanation) > 900:
                 for i in range(len(explanation), 0, -1):
                     if str(explanation)[i - 1] == '.' and i <= 1000:
                         explanation = explanation[:i]
