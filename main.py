@@ -99,26 +99,32 @@ def callback(message):
         title = data['title']
         explanation = data['explanation']
         print(url)
-        image_response = requests.get(url)
-        image = Image.open(BytesIO(image_response.content))
+        if 'www.youtube.com' not in url:
+            image_response = requests.get(url)
 
-        if not image_dir.exists():
-            os.mkdir(image_dir)
-        image.save(image_dir / f'{title}.{image.format}', image.format)
+            image = Image.open(BytesIO(image_response.content))
 
-        image = Image.open(BytesIO(image_response.content))
-        if image:
-            print('image success')
-            if len(explanation) > 900:
-                for i in range(len(explanation), 0, -1):
-                    if str(explanation)[i - 1] == '.' and i <= 1000:
-                        explanation = explanation[:i]
-                        break
-                bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
+            if not image_dir.exists():
+                os.mkdir(image_dir)
+            image.save(image_dir / f'{title}.{image.format}', image.format)
+
+            image = Image.open(BytesIO(image_response.content))
+            if image:
+                print('image success')
+                if len(explanation) > 900:
+                    for i in range(len(explanation), 0, -1):
+                        if str(explanation)[i - 1] == '.' and i <= 1000:
+                            explanation = explanation[:i]
+                            break
+                    bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
+                                   f'name: {title} \nexplanation: {explanation}')
+                else:
+                    bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
                                f'name: {title} \nexplanation: {explanation}')
-            else:
-                bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
-                           f'name: {title} \nexplanation: {explanation}')
+
+        else:
+            bot.send_message(message.from_user.id, url)
+
     elif message.text == '⬅назад':
         start(message)
     elif message.text == 'викторина':
