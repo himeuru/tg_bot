@@ -91,39 +91,44 @@ def callback(message):
             url_for_date = f'{api_url}&date={(datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d")}'
         elif message.text == 'позавчерашнее фото дня':
             url_for_date = f'{api_url}&date={(datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")}'
+        try:
+            response = requests.get(url_for_date)
+            response.raise_for_status()
+            data = response.json()
+            url = data['url']
+            title = data['title']
+            explanation = data['explanation']
+            print(url)
+        except Exception:
+            url = False
+        if url:
+            if 'www.youtube.com' not in url:
+                image_response = requests.get(url)
 
-        response = requests.get(url_for_date)
-        response.raise_for_status()
-        data = response.json()
-        url = data['url']
-        title = data['title']
-        explanation = data['explanation']
-        print(url)
-        if 'www.youtube.com' not in url:
-            image_response = requests.get(url)
+                image = Image.open(BytesIO(image_response.content))
 
-            image = Image.open(BytesIO(image_response.content))
+                if not image_dir.exists():
+                    os.mkdir(image_dir)
+                image.save(image_dir / f'{title}.{image.format}', image.format)
 
-            if not image_dir.exists():
-                os.mkdir(image_dir)
-            image.save(image_dir / f'{title}.{image.format}', image.format)
-
-            image = Image.open(BytesIO(image_response.content))
-            if image:
-                print('image success')
-                if len(explanation) > 900:
-                    for i in range(len(explanation), 0, -1):
-                        if str(explanation)[i - 1] == '.' and i <= 1000:
-                            explanation = explanation[:i]
-                            break
-                    bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
+                image = Image.open(BytesIO(image_response.content))
+                if image:
+                    print('image success')
+                    if len(explanation) > 900:
+                        for i in range(len(explanation), 0, -1):
+                            if str(explanation)[i - 1] == '.' and i <= 1000:
+                                explanation = explanation[:i]
+                                break
+                        bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
+                                       f'name: {title} \nexplanation: {explanation}')
+                    else:
+                        bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
                                    f'name: {title} \nexplanation: {explanation}')
-                else:
-                    bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
-                               f'name: {title} \nexplanation: {explanation}')
 
+            elif 'www.youtube.com' in url:
+                bot.send_message(message.from_user.id, url)
         else:
-            bot.send_message(message.from_user.id, url)
+            bot.send_message(message.from_user.id, 'сегодняшнее фото ещё не загружено')
 
     elif message.text == '⬅назад':
         start(message)
