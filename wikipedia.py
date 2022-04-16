@@ -1,5 +1,4 @@
 import telebot, wikipedia, re
-
 bot = telebot.TeleBot('5273072249:AAF2OLkMgDNCUtEhdAftkoNhRRCDwfEyn9k')
 wikipedia.set_lang("ru")
 
@@ -36,3 +35,4 @@ def handle_text(message):
 
 
 bot.polling(none_stop=True, interval=0)
+
