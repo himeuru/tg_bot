@@ -74,15 +74,6 @@ def received_birth_day(update, context):
         update.message.reply_text("Забавно, но кажись это не так...")
 
 
-def help(update, context):
-    update.message.reply_text('Помощь уже в пути')
-
-
-def error(update, context):
-    update.message.reply_text('Произошла ошибка')
-
-
-# function to handle normal text
 def text(update, context):
     global STATE
     if STATE == BIRTH_YEAR:
@@ -97,7 +88,6 @@ def biorhythm(update, context):
     print("Окей")
     user_biorhythm = calculate_biorhythm(
         context.user_data['birthday'])
-
     update.message.reply_text(f"Физический: {user_biorhythm['phisical']}")
     update.message.reply_text(f"Эмоциональный: {user_biorhythm['emotional']}")
     update.message.reply_text(f"Интеллектуальный: {user_biorhythm['intellectual']}")
@@ -128,7 +118,6 @@ def main():
     dispatcher.add_handler(CommandHandler("help", help))
     dispatcher.add_handler(CommandHandler("biorhythm", biorhythm))
     dispatcher.add_handler(MessageHandler(Filters.text, text))
-    dispatcher.add_error_handler(error)
     updater.start_polling()
     updater.idle()
 
