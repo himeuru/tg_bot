@@ -69,7 +69,7 @@ def received_birth_day(update, context):
         context.user_data['birthday'] = birthday
         STATE = None
         update.message.reply_text(f'Хорошо, ты родился в {birthday},'
-                                  f' чтобы узнать провести анализ напиши мне команду /biorhythm')
+                                  f' чтобы узнать свои биоритмы и провести их анализ напиши мне команду /biorhythm')
     except:
         update.message.reply_text("Забавно, но кажись это не так...")
 
