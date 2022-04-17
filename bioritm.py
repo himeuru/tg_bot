@@ -39,7 +39,7 @@ def received_birth_year(update, context):
         update.message.reply_text(f"Хорошо, теперь мне нужно знать месяц (в численной форме)")
         STATE = BIRTH_MONTH
     except:
-        update.message.reply_text("Забавно, но кажись это не так...")
+        update.message.reply_text("Забавно, но кажись это не так...Попробуй снова")
 
 
 def received_birth_month(update, context):
@@ -53,7 +53,7 @@ def received_birth_month(update, context):
         update.message.reply_text(f"Здорово! И теперь день...")
         STATE = BIRTH_DAY
     except:
-        update.message.reply_text("Забавно, но кажись это не так...")
+        update.message.reply_text("Забавно, но кажись это не так...Попробуй снова")
 
 
 def received_birth_day(update, context):
@@ -71,7 +71,7 @@ def received_birth_day(update, context):
         update.message.reply_text(f'Хорошо, ты родился в {birthday},'
                                   f' чтобы узнать свои биоритмы и провести их анализ напиши мне команду /biorhythm')
     except:
-        update.message.reply_text("Забавно, но кажись это не так...")
+        update.message.reply_text("Забавно, но кажись это не так...Попробуй снова")
 
 
 def text(update, context):
