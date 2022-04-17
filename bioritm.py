@@ -115,7 +115,6 @@ def main():
     updater = Updater(TOKEN, use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("help", help))
     dispatcher.add_handler(CommandHandler("biorhythm", biorhythm))
     dispatcher.add_handler(MessageHandler(Filters.text, text))
     updater.start_polling()
