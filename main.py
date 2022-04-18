@@ -8,12 +8,14 @@ from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
 from dictionaries import _comets, _nebulae, _solar, _stars, _satellites
+from bioritm import *
+from wikipedia import getwiki
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
 db_sess = db_session.create_session()
 info = Info()
-main_btns, album_btns, photo_btns = True, False, False
+main_btns, album_btns, photo_btns, biorhythm_btns = True, False, False, False
 comets_btn, nebulae_btn, solar_btn, stars_btn, satellites_btn = False, False, False, False, False
 
 
@@ -38,10 +40,10 @@ def start(message):
         db_sess.commit()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     photo_choose_button = types.KeyboardButton("фото")
-    quiz_button = types.KeyboardButton("викторина")
     album_button = types.KeyboardButton("альбом")
+    biorythm_button = types.KeyboardButton("биоритм")
     exp_button = types.KeyboardButton("мой опыт")
-    markup.add(photo_choose_button, quiz_button, album_button, exp_button)
+    markup.add(photo_choose_button, album_button, biorythm_button, exp_button)
     bot.send_message(message.chat.id, "выберите кнопку", reply_markup=markup)
 
 
@@ -71,13 +73,16 @@ def callback(message):
         if message.text == 'фото':
             main_btns, photo_btns = False, True
             photo_msg(message)
-        elif message.text == 'викторина':
-            bot.send_message(message.chat.id, 'в разработке')
+        elif message.text == 'биоритм':
+            main_btns, biorhythm_btns = False, True
+            start_getting_birthday_info(bot, message)
         elif message.text == 'альбом':
-            main_btns, album_btns = False, True
+            main_btns, album_btns,  = False, True
             album(message)
         elif message.text == 'мой опыт':
-            bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта')
+            exp_call(info_exp, message)
+        else:
+            bot.send_message(message.chat.id, getwiki(message.text))
     elif album_btns:
         if message.text == 'кометы' or message.text.lower() in _comets or (
                 message.text.isdigit() and 0 <= int(message.text) - 1 < len(_comets) and comets_btn):
@@ -103,34 +108,31 @@ def callback(message):
             comets_btn, nebulae_btn, solar_btn, stars_btn, satellites_btn, main_btns, album_btns = \
                 False, False, False, False, False, True, False
             start(message)
+        else:
+            bot.send_message(message.chat.id, getwiki(message.text))
     elif photo_btns:
         if 'фото дня' in message.text:
             daily_photo_msg(message)
         elif message.text == '⬅назад':
             main_btns, photo_btns = True, False
             start(message)
+        else:
+            bot.send_message(message.chat.id, getwiki(message.text))
+
+
+def exp_call(exp, message):
+    bot.send_message(message.chat.id, f'у вас {int(exp)} опыта')
 
 
 def daily_photo_msg(message):
     global url_for_date, info_exp
     if message.text == 'фото дня':
-        url_for_date = f'{api_url}&date={datetime.now().strftime("%Y-%m-%d")}'
-        time = (datetime.now())
-        sort_time = [str(time)[:-16].split('-'), str(info_time).split('-')]
-        res = sorted(sort_time, key=lambda x: (x[0], x[1], x[2]))
-        if res[0] == str(info_time).split('-') and res[0] != res[1]:
-            info.daily_photo_time = str(time)[:-16]
-            info.name = info_name
-            info.exp = int(info_exp) + 5
-            db_sess.execute(f"""UPDATE information SET exp='{info.exp}', daily_photo_time='{info.daily_photo_time}' 
-                        WHERE id='{info_id}'""")
-            db_sess.commit()
-            info_exp = info.exp
-            bot.send_message(message.chat.id, "вы получили 5 опыта")
+        url_for_date = f'{api_url}&date={datetime.datetime.now().strftime("%Y-%m-%d")}'
+        get_exp(message)
     elif message.text == 'вчерашнее фото дня':
-        url_for_date = f'{api_url}&date={(datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={(datetime.datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")}'
     elif message.text == 'позавчерашнее фото дня':
-        url_for_date = f'{api_url}&date={(datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={(datetime.datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")}'
     try:
         response = requests.get(url_for_date)
         response.raise_for_status()
@@ -143,32 +145,49 @@ def daily_photo_msg(message):
         url = False
     if url:
         if 'www.youtube.com' not in url:
-            image_response = requests.get(url)
-
-            image = Image.open(BytesIO(image_response.content))
-
-            if not image_dir.exists():
-                os.mkdir(image_dir)
-            image.save(image_dir / f'{title}.{image.format}', image.format)
-
-            image = Image.open(BytesIO(image_response.content))
-            if image:
-                print('image success')
-                if len(explanation) > 950:
-                    for i in range(len(explanation), 0, -1):
-                        if str(explanation)[i - 1] == '.' and i <= 950:
-                            explanation = explanation[:i]
-                            break
-                    bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
-                                   f'name: {title} \nexplanation: {explanation}')
-                else:
-                    bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
-                                   f'name: {title} \nexplanation: {explanation}')
+            image_send(explanation, message, title, url)
 
         elif 'www.youtube.com' in url:
             bot.send_message(message.from_user.id, url)
     else:
         bot.send_message(message.from_user.id, 'сегодняшнее фото ещё не загружено')
+
+
+def image_send(explanation, message, title, url):
+    image_response = requests.get(url)
+    image = Image.open(BytesIO(image_response.content))
+    if not image_dir.exists():
+        os.mkdir(image_dir)
+    image.save(image_dir / f'{title}.{image.format}', image.format)
+    image = Image.open(BytesIO(image_response.content))
+    if image:
+        print('image success')
+        if len(explanation) > 950:
+            for i in range(len(explanation), 0, -1):
+                if str(explanation)[i - 1] == '.' and i <= 950:
+                    explanation = explanation[:i]
+                    break
+            bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
+                           f'name: {title} \nexplanation: {explanation}')
+        else:
+            bot.send_photo(message.from_user.id, open(f'./images/{title}.{image.format}', 'rb'),
+                           f'name: {title} \nexplanation: {explanation}')
+
+
+def get_exp(message):
+    global info_exp
+    time = datetime.datetime.now()
+    sort_time = [str(time)[:-16].split('-'), str(info_time).split('-')]
+    res = sorted(sort_time, key=lambda x: (x[0], x[1], x[2]))
+    if res[0] == str(info_time).split('-') and res[0] != res[1]:
+        info.daily_photo_time = str(time)[:-16]
+        info.name = info_name
+        info.exp = int(info_exp) + 5
+        db_sess.execute(f"""UPDATE information SET exp='{info.exp}', daily_photo_time='{info.daily_photo_time}' 
+                        WHERE id='{info_id}'""")
+        db_sess.commit()
+        info_exp = info.exp
+        bot.send_message(message.chat.id, "вы получили 5 опыта")
 
 
 def photo_msg(message):
