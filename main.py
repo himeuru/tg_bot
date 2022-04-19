@@ -117,7 +117,7 @@ def callback(message):
 
 
 def exp_call(exp, message):
-    bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта\nваш ранг {set_rank(info_exp)}')
+    bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта\nваш ранг - {set_rank(info_exp)}')
 
 
 def daily_photo_msg(message):
