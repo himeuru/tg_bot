@@ -8,7 +8,6 @@ from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
 from dictionaries import _comets, _nebulae, _solar, _stars, _satellites
-from bioritm import *
 from wikipedia_callback import getwiki
 
 bot = telebot.TeleBot(bot_token)
@@ -73,9 +72,6 @@ def callback(message):
         if message.text == 'фото':
             main_btns, photo_btns = False, True
             photo_msg(message)
-        elif message.text == 'биоритм':
-            main_btns, biorhythm_btns = False, True
-            start_getting_birthday_info(bot, message)
         elif message.text == 'альбом':
             main_btns, album_btns,  = False, True
             album(message)
@@ -127,12 +123,12 @@ def exp_call(exp, message):
 def daily_photo_msg(message):
     global url_for_date, info_exp
     if message.text == 'фото дня':
-        url_for_date = f'{api_url}&date={datetime.datetime.now().strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={datetime.now().strftime("%Y-%m-%d")}'
         get_exp(message)
     elif message.text == 'вчерашнее фото дня':
-        url_for_date = f'{api_url}&date={(datetime.datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={(datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")}'
     elif message.text == 'позавчерашнее фото дня':
-        url_for_date = f'{api_url}&date={(datetime.datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={(datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")}'
     try:
         response = requests.get(url_for_date)
         response.raise_for_status()
@@ -176,7 +172,7 @@ def image_send(explanation, message, title, url):
 
 def get_exp(message):
     global info_exp
-    time = datetime.datetime.now()
+    time = datetime.now()
     sort_time = [str(time)[:-16].split('-'), str(info_time).split('-')]
     res = sorted(sort_time, key=lambda x: (x[0], x[1], x[2]))
     if res[0] == str(info_time).split('-') and res[0] != res[1]:
