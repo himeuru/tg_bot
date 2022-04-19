@@ -9,7 +9,7 @@ from data import db_session
 from data.db_session import Info, __factory
 from dictionaries import _comets, _nebulae, _solar, _stars, _satellites
 from bioritm import *
-from wikipedia import getwiki
+from wikipedia_callback import getwiki
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
@@ -121,7 +121,7 @@ def callback(message):
 
 
 def exp_call(exp, message):
-    bot.send_message(message.chat.id, f'у вас {int(exp)} опыта')
+    bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта\nваш ранг {set_rank(info_exp)}')
 
 
 def daily_photo_msg(message):
@@ -342,6 +342,22 @@ def satellites(message):
                            _satellites[int(message.text[0]) - 1][int(message.text[2:]) - 1])
         except Exception:
             print('wrong input')
+
+
+def set_rank(exp):
+    global info_exp, rank
+    exp = int(info_exp)
+    if exp >= 0:
+        rank = 'Неофит'
+    elif exp >= 5:
+        rank = 'Ученик'
+    elif exp >= 10:
+        rank = 'Адепт'
+    elif exp >= 15:
+        rank = 'Искатель'
+    elif exp >= 20:
+        rank = 'Охотник'
+    return rank
 
 
 if __name__ == '__main__':
