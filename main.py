@@ -8,13 +8,14 @@ from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
 from dictionaries import _comets, _nebulae, _solar, _stars, _satellites
-from wikipedia import getwiki
+from weather_tg_bot import *
+from wikipedia_callback import getwiki
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
 db_sess = db_session.create_session()
 info = Info()
-main_btns, album_btns, photo_btns, biorhythm_btns = True, False, False, False
+main_btns, album_btns, photo_btns, weather_btns = True, False, False, False
 comets_btn, nebulae_btn, solar_btn, stars_btn, satellites_btn = False, False, False, False, False
 
 
@@ -31,8 +32,8 @@ def start(message):
 
     if len(params) == 0:
         info.exp, info_exp = 0, 0
-        info.daily_photo_time, info_time = str(datetime.now() - timedelta(days=1))[:-16], \
-                                           str(datetime.now() - timedelta(days=1))[:-16]
+        info.daily_photo_time, info_time = str(datetime.datetime.now() - timedelta(days=1))[:-16], \
+                                           str(datetime.datetime.now() - timedelta(days=1))[:-16]
         info.id, info_id = message.chat.id, message.chat.id
         info.name, info_name = message.from_user.username, message.from_user.username
         db_sess.add(info)
@@ -40,9 +41,9 @@ def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     photo_choose_button = types.KeyboardButton("фото")
     album_button = types.KeyboardButton("альбом")
-    biorythm_button = types.KeyboardButton("биоритм")
+    weather_button = types.KeyboardButton("погода")
     exp_button = types.KeyboardButton("мой опыт")
-    markup.add(photo_choose_button, album_button, biorythm_button, exp_button)
+    markup.add(photo_choose_button, album_button, weather_button, exp_button)
     bot.send_message(message.chat.id, "выберите кнопку", reply_markup=markup)
 
 
@@ -50,8 +51,8 @@ def start(message):
 def callback(message):
     print('callback to:', message.chat.id, message.chat.username)
 
-    global info_id, info_name, info_exp, info_time, main_btns, album_btns, photo_btns, comets_btn, nebulae_btn, \
-        solar_btn, stars_btn, satellites_btn
+    global info_id, info_name, info_exp, info_time, main_btns, album_btns, photo_btns, weather_btns, comets_btn, \
+        nebulae_btn, solar_btn, stars_btn, satellites_btn
     params = []
     for param in session.query(Info).filter(Info.id == message.chat.id):
         params = str(param).split(',')
@@ -72,9 +73,9 @@ def callback(message):
         if message.text == 'фото':
             main_btns, photo_btns = False, True
             photo_msg(message)
-        elif message.text == 'биоритм':
-            main_btns, biorhythm_btns = False, True
-            start_getting_birthday_info(bot, message)
+        elif message.text == 'погода':
+            main_btns, weather_btns = False, True
+            weather(message)
         elif message.text == 'альбом':
             main_btns, album_btns,  = False, True
             album(message)
@@ -117,10 +118,16 @@ def callback(message):
             start(message)
         else:
             bot.send_message(message.chat.id, getwiki(message.text))
+    elif weather_btns:
+        if message.text == '⬅назад':
+            main_btns, weather_btns = True, False
+            start(message)
+        else:
+            findd(message)
 
 
 def exp_call(exp, message):
-    bot.send_message(message.chat.id, f'у вас {int(exp)} опыта')
+    bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта\nваш ранг {set_rank()}')
 
 
 def daily_photo_msg(message):
@@ -341,6 +348,22 @@ def satellites(message):
                            _satellites[int(message.text[0]) - 1][int(message.text[2:]) - 1])
         except Exception:
             print('wrong input')
+
+
+def set_rank():
+    global info_exp, rank
+    exp = int(info_exp)
+    if exp >= 0:
+        rank = 'Неофит'
+    elif exp >= 5:
+        rank = 'Ученик'
+    elif exp >= 10:
+        rank = 'Адепт'
+    elif exp >= 15:
+        rank = 'Искатель'
+    elif exp >= 20:
+        rank = 'Охотник'
+    return rank
 
 
 if __name__ == '__main__':
