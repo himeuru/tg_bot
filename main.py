@@ -8,7 +8,8 @@ from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
 from dictionaries import _comets, _nebulae, _solar, _stars, _satellites
-from wikipedia_callback import getwiki
+from bioritm import *
+from wikipedia import getwiki
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
@@ -72,6 +73,9 @@ def callback(message):
         if message.text == 'фото':
             main_btns, photo_btns = False, True
             photo_msg(message)
+        elif message.text == 'биоритм':
+            main_btns, biorhythm_btns = False, True
+            start_getting_birthday_info(bot, message)
         elif message.text == 'альбом':
             main_btns, album_btns,  = False, True
             album(message)
@@ -117,18 +121,18 @@ def callback(message):
 
 
 def exp_call(exp, message):
-    bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта\nваш ранг - {set_rank(info_exp)}')
+    bot.send_message(message.chat.id, f'у вас {int(exp)} опыта')
 
 
 def daily_photo_msg(message):
     global url_for_date, info_exp
     if message.text == 'фото дня':
-        url_for_date = f'{api_url}&date={datetime.now().strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={datetime.datetime.now().strftime("%Y-%m-%d")}'
         get_exp(message)
     elif message.text == 'вчерашнее фото дня':
-        url_for_date = f'{api_url}&date={(datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={(datetime.datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")}'
     elif message.text == 'позавчерашнее фото дня':
-        url_for_date = f'{api_url}&date={(datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={(datetime.datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")}'
     try:
         response = requests.get(url_for_date)
         response.raise_for_status()
@@ -172,7 +176,7 @@ def image_send(explanation, message, title, url):
 
 def get_exp(message):
     global info_exp
-    time = datetime.now()
+    time = datetime.datetime.now()
     sort_time = [str(time)[:-16].split('-'), str(info_time).split('-')]
     res = sorted(sort_time, key=lambda x: (x[0], x[1], x[2]))
     if res[0] == str(info_time).split('-') and res[0] != res[1]:
@@ -338,22 +342,6 @@ def satellites(message):
                            _satellites[int(message.text[0]) - 1][int(message.text[2:]) - 1])
         except Exception:
             print('wrong input')
-
-
-def set_rank(exp):
-    global info_exp, rank
-    exp = int(info_exp)
-    if exp >= 0:
-        rank = 'Неофит'
-    elif exp >= 5:
-        rank = 'Ученик'
-    elif exp >= 10:
-        rank = 'Адепт'
-    elif exp >= 15:
-        rank = 'Искатель'
-    elif exp >= 20:
-        rank = 'Охотник'
-    return rank
 
 
 if __name__ == '__main__':
