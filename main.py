@@ -8,7 +8,6 @@ from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
 from dictionaries import _comets, _nebulae, _solar, _stars, _satellites
-from bioritm import *
 from wikipedia import getwiki
 
 bot = telebot.TeleBot(bot_token)
