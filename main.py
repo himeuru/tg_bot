@@ -119,7 +119,7 @@ def callback(message):
         else:
             bot.send_message(message.chat.id, getwiki(message.text))
     elif weather_btns:
-        if message.text == '⬅назад':
+        if message.text.lower() == 'назад':
             main_btns, weather_btns = True, False
             start(message)
         else:

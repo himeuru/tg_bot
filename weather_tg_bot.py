@@ -17,6 +17,7 @@ def weather(message):
 
 def findd(message):
     if message.text.lower() == 'назад':
+        main_btns, weather_btns = True, False
         start(message)
     else:
         try:
