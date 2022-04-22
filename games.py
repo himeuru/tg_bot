@@ -1,12 +1,13 @@
 from telebot import TeleBot, types
 from random import randint
+from PIL import Image
 from data.cfg import *
 
 
 pictures = {
-    0: '/images/game/планеты.jpg',
-    1: '/images/game/остров.jpg',
-    2: '/images/game/космолёт.jpg',
+    0: './images/game/планеты.jpg',
+    1: './images/game/остров.jpg',
+    2: './images/game/космолёт.jpg',
 }
 states = {}
 inventories = {}
@@ -34,8 +35,9 @@ def user_answer(message):
 
 
 def process_state(user, state, inventory):
+    image = Image.open(pictures[state])
     kb = types.InlineKeyboardMarkup()
-    bot.send_photo(user, pictures[state])
+    bot.send_photo(user, image)
     if state == 0:
         kb.add(types.InlineKeyboardButton(text="полететь направо", callback_data="1"))
         kb.add(types.InlineKeyboardButton(text="полететь налево", callback_data="2"))
