@@ -64,8 +64,8 @@ def callback(message):
         info_time = params[3][1:-2]
     if len(params) == 0:
         info.exp, info_exp = 0, 0
-        info.daily_photo_time, info_time = str(datetime.now() - timedelta(days=1))[:-16], \
-                                           str(datetime.now() - timedelta(days=1))[:-16]
+        info.daily_photo_time, info_time = str(datetime.datetime.now() - timedelta(days=1))[:-16], \
+                                           str(datetime.datetime.now() - timedelta(days=1))[:-16]
         info.id, info_id = message.chat.id, message.chat.id
         info.name, info_name = message.from_user.username, message.from_user.username
         db_sess.add(info)
