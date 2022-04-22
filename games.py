@@ -39,17 +39,16 @@ def process_state(user, state, inventory):
     kb = types.InlineKeyboardMarkup()
     bot.send_photo(user, image)
     if state == 0:
-        kb.add(types.InlineKeyboardButton(text="полететь направо", callback_data="1"))
-        kb.add(types.InlineKeyboardButton(text="полететь налево", callback_data="2"))
-        bot.send_message(user, "Вы в оказались в открытом космосе, перед вами две планеты.", reply_markup=kb)
+        bot.send_message(user, "Вы в оказались в открытом космосе, перед вами две планеты.\n \n"
+                               "1) Полететь направо \n"
+                               "2) Полететь налево", reply_markup=kb)
     if state == 1:
-        kb.add(types.InlineKeyboardButton(text="доплыть до островка", callback_data="1"))
-        kb.add(types.InlineKeyboardButton(text="телепорт обратно на космолёт", callback_data="2"))
         bot.send_message(user, "К удивлению планета оказалась пригодной для жизни, но в большинстве преобладает вода,"
-                               " вдали виднеется маленький островок.",
-                         reply_markup=kb)
+                               " вдали виднеется маленький островок. \n \n"
+                               "1) Доплыть до островка\n"
+                               "2) Телепорт обратно на космолёт", reply_markup=kb)
     if state == 2:
-        bot.send_message(user, "Спасибо за игру! Вы выйграли.")
+        bot.send_message(user, "Спасибо за игру!")
 
 
 def process_answer(user, answer):
