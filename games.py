@@ -4,14 +4,13 @@ from data.cfg import *
 
 
 pictures = {
-    0: "https://storage.geekclass.ru/images/760e484b-a099-4a7a-a722-5aec9a933614.jpg",
-    1: "https://storage.geekclass.ru/images/4637fc41-08df-466a-b112-aa577dba6c1d.jpg",
-    2: "https://storage.geekclass.ru/images/c2a2a60c-9c7b-4c3a-b663-42d2559bf869.jpg"
+    0: '/images/game/планеты.jpg',
+    1: '/images/game/остров.jpg',
+    2: '/images/game/космолёт.jpg',
 }
 states = {}
 inventories = {}
 bot = TeleBot(bot_token)
-
 
 
 @bot.message_handler(commands=["game"])
@@ -38,16 +37,17 @@ def process_state(user, state, inventory):
     kb = types.InlineKeyboardMarkup()
     bot.send_photo(user, pictures[state])
     if state == 0:
-        kb.add(types.InlineKeyboardButton(text="пойти направо", callback_data="1"))
-        kb.add(types.InlineKeyboardButton(text="пойти налево", callback_data="2"))
-        bot.send_message(user, "Вы в оказались в темном подземелье, перед вами два прохода.", reply_markup=kb)
+        kb.add(types.InlineKeyboardButton(text="полететь направо", callback_data="1"))
+        kb.add(types.InlineKeyboardButton(text="полететь налево", callback_data="2"))
+        bot.send_message(user, "Вы в оказались в открытом космосе, перед вами две планеты.", reply_markup=kb)
     if state == 1:
-        kb.add(types.InlineKeyboardButton(text="переплыть", callback_data="1"))
-        kb.add(types.InlineKeyboardButton(text="вернуться", callback_data="2"))
-        bot.send_message(user, "Перед вами большое подземное озеро, а вдали виднеется маленький остров.",
+        kb.add(types.InlineKeyboardButton(text="доплыть до островка", callback_data="1"))
+        kb.add(types.InlineKeyboardButton(text="телепорт обратно на космолёт", callback_data="2"))
+        bot.send_message(user, "К удивлению планета оказалась пригодной для жизни, но в большинстве преобладает вода,"
+                               " вдали виднеется маленький островок.",
                          reply_markup=kb)
     if state == 2:
-        bot.send_message(user, "Вы выиграли.")
+        bot.send_message(user, "Спасибо за игру! Вы выйграли.")
 
 
 def process_answer(user, answer):
@@ -56,26 +56,29 @@ def process_answer(user, answer):
             states[user] = 1
         else:
             if "key" in inventories[user]:
-                bot.send_message(user, "Перед вами закрытая дверь. Вы пробуете открыть ее ключем,"
-                                       " и дверь поддается. Кажется, это выход.")
+                bot.send_message(user, "Вы спускаетесь на планету, её температура теперь не страшна вам. "
+                                       " После недолгих поисков вы находите редкий образец метеорита."
+                                       " Кажется, теперь вы можете возвращаться на космолёт.")
                 states[user] = 2
             else:
-                bot.send_message(user, "Перед вами закрытая дверь, и, кажется, без ключа ее не открыть."
+                bot.send_message(user, "Планета слишком горячая чтоб спускаться на неё, и, кажется вам"
+                                       " потребуется огнеупорный скафандр."
                                        "Придется вернуться обратно.")
                 states[user] = 0
     elif states[user] == 1:
         if answer == "2":
-            bot.send_message(user, "И правда, не стоит штурмовать неизвестные воды. Возвращаемся назад...")
+            bot.send_message(user, "И правда, не стоит спускаться на неизвестную планету. Возвращаемся назад...")
             states[user] = 0
         else:
-            bot.send_message(user, "Вы пробуете переплыть озеро...")
+            bot.send_message(user, "Вы пробуете доплыть до этого островка...")
             chance = randint(0, 100)
             if chance > 30:
-                bot.send_message(user, "Вода оказалось теплой, а в сундуке на острове вы нашли старый ключ."
-                                       " Стоит вернутся обратно.")
+                bot.send_message(user, "Вода оказалось теплой, в капсуле на островке вы находите огнеупорный скафандр."
+                                       " Стоит вернутся на космолёт и опробовать его в деле.")
                 inventories[user].append("key")
                 states[user] = 0
             else:
-                bot.send_message(user, "На середине озера вас подхватывают волны и возвращают обратно.")
+                bot.send_message(user, "Из-за перепадов давления начинается шторм, на полпути вас подхватывают волны"
+                                       " и возвращают обратно.")
                 states[user] = 1
     process_state(user, states[user], inventories[user])
