@@ -60,11 +60,11 @@ def process_answer(user, answer):
             bot.send_message(user, "И правда, не стоит штурмовать неизвестные воды. Возвращаемся назад...")
             states[user] = 0
         else:
-            bot.send_message(user,"Вы пробуете переплыть озеро...")
+            bot.send_message(user, "Вы пробуете переплыть озеро...")
             chance = randint(0, 100)
             if chance > 30:
-                bot.send_message(user,"Вода оказалось теплой, а в сундуке на острове вы нашли старый ключ."
-                                      " Стоит вернутся обратно.")
+                bot.send_message(user, "Вода оказалось теплой, а в сундуке на острове вы нашли старый ключ."
+                                       " Стоит вернутся обратно.")
                 inventories[user].append("key")
                 states[user] = 0
             else:
