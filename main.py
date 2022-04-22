@@ -9,13 +9,14 @@ from data import db_session
 from data.db_session import Info, __factory
 from dictionaries import _comets, _nebulae, _solar, _stars, _satellites
 from weather_tg_bot import *
+from games import *
 from wikipedia_callback import getwiki
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
 db_sess = db_session.create_session()
 info = Info()
-main_btns, album_btns, photo_btns, weather_btns = True, False, False, False
+main_btns, album_btns, photo_btns, weather_btns, game_btns = True, False, False, False, False
 comets_btn, nebulae_btn, solar_btn, stars_btn, satellites_btn = False, False, False, False, False
 
 
@@ -42,8 +43,9 @@ def start(message):
     photo_choose_button = types.KeyboardButton("фото")
     album_button = types.KeyboardButton("альбом")
     weather_button = types.KeyboardButton("погода")
+    game_button = types.KeyboardButton("игра")
     exp_button = types.KeyboardButton("мой опыт")
-    markup.add(photo_choose_button, album_button, weather_button, exp_button)
+    markup.add(photo_choose_button, album_button, weather_button, game_button, exp_button)
     bot.send_message(message.chat.id, "выберите кнопку", reply_markup=markup)
 
 
@@ -51,8 +53,8 @@ def start(message):
 def callback(message):
     print('callback to:', message.chat.id, message.chat.username)
 
-    global info_id, info_name, info_exp, info_time, main_btns, album_btns, photo_btns, weather_btns, comets_btn, \
-        nebulae_btn, solar_btn, stars_btn, satellites_btn
+    global info_id, info_name, info_exp, info_time, main_btns, album_btns, photo_btns, weather_btns, game_btns, \
+        comets_btn, nebulae_btn, solar_btn, stars_btn, satellites_btn
     params = []
     for param in session.query(Info).filter(Info.id == message.chat.id):
         params = str(param).split(',')
@@ -81,6 +83,9 @@ def callback(message):
             album(message)
         elif message.text == 'мой опыт':
             exp_call(info_exp, message)
+        elif message.text == 'игра':
+            main_btns, game_btns, = False, True
+            start_game(message)
         else:
             bot.send_message(message.chat.id, getwiki(message.text))
     elif album_btns:
@@ -124,6 +129,13 @@ def callback(message):
             start(message)
         else:
             findd(message)
+    elif game_btns:
+        if message.text.lower() == '⬅назад':
+            main_btns, weather_btns = True, False
+            start(message)
+
+        else:
+            user_answer(message)
 
 
 def exp_call(exp, message):
