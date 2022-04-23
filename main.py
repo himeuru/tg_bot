@@ -139,7 +139,7 @@ def callback(message):
 
 
 def exp_call(exp, message):
-    bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта\nваш ранг {set_rank()}')
+    bot.send_message(message.chat.id, f'у вас {int(info_exp)} опыта\nваш ранг: {set_rank()}')
 
 
 def daily_photo_msg(message):
@@ -365,45 +365,45 @@ def satellites(message):
 def set_rank():
     global info_exp, rank
     exp = int(info_exp)
-    if exp >= 0:
+    if 5 > exp >= 0:
         rank = 'Неофит'
-    elif exp >= 5:
+    elif 10 > exp >= 5:
         rank = 'Серебряный Неофит'
-    elif exp >= 10:
+    elif 15 > exp >= 10:
         rank = 'Золотой Неофит'
-    elif exp >= 15:
+    elif 20 > exp >= 15:
         rank = 'Ученик'
-    elif exp >= 20:
+    elif 25 > exp >= 20:
         rank = 'Серебряный Ученик'
-    elif exp >= 25:
+    elif 30 > exp >= 25:
         rank = 'Золотой Ученик'
-    elif exp >= 30:
+    elif 35 > exp >= 30:
         rank = 'Адепт'
-    elif exp >= 35:
+    elif 40 > exp >= 35:
         rank = 'Серебряный Адепт'
-    elif exp >= 40:
+    elif 45 > exp >= 40:
         rank = 'Золотой Адепт'
-    elif exp >= 45:
+    elif 50 > exp >= 45:
         rank = 'Искатель'
-    elif exp >= 50:
+    elif 55 > exp >= 50:
         rank = 'Серебряный Искатель'
-    elif exp >= 55:
+    elif 60 > exp >= 55:
         rank = 'Золотой Искатель'
-    elif exp >= 60:
+    elif 65 > exp >= 60:
         rank = 'Серебряный Охотник'
-    elif exp >= 65:
+    elif 70 > exp >= 65:
         rank = 'Золотой Охотник'
-    elif exp >= 70:
+    elif 75 > exp >= 70:
         rank = 'Орел'
-    elif exp >= 75:
+    elif 80 > exp >= 75:
         rank = 'Серебряный Орел'
-    elif exp >= 80:
+    elif 85 > exp >= 80:
         rank = 'Золотой Орел'
-    elif exp >= 85:
+    elif 90 > exp >= 85:
         rank = 'Тигр'
-    elif exp >= 90:
+    elif 95 > exp >= 90:
         rank = 'Серебряный Тигр'
-    elif exp >= 95:
+    elif 100 > exp >= 95:
         rank = 'Золотой Тигр'
     elif exp >= 100:
         rank = 'Истинный мастер'
