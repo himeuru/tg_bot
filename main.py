@@ -7,10 +7,10 @@ from PIL import Image
 from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
-from dictionaries import _comets, _nebulae, _solar, _stars, _satellites
-from weather_tg_bot import *
-from games import *
-from wikipedia_callback import getwiki
+from data.dictionaries import _comets, _nebulae, _solar, _stars, _satellites
+from data.weather_tg_bot import *
+from data.games import *
+from data.wikipedia_callback import getwiki
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
