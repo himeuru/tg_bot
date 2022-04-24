@@ -5,3 +5,4 @@ pyTelegramBotAPI==4.4.1
 requests==2.27.1
 telebot==0.0.4
 urllib3==1.26.9
+sqlalchemy
