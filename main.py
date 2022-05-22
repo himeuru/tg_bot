@@ -8,9 +8,6 @@ from data.cfg import *
 from data import db_session
 from data.db_session import Info, __factory
 from data.dictionaries import _comets, _nebulae, _solar, _stars, _satellites
-from data.weather_tg_bot import *
-from data.games import *
-from data.wikipedia_callback import getwiki
 
 bot = telebot.TeleBot(bot_token)
 session = __factory()
@@ -33,8 +30,8 @@ def start(message):
 
     if len(params) == 0:
         info.exp, info_exp = 0, 0
-        info.daily_photo_time, info_time = str(datetime.datetime.now() - timedelta(days=1))[:-16], \
-                                           str(datetime.datetime.now() - timedelta(days=1))[:-16]
+        info.daily_photo_time, info_time = str(datetime.now() - timedelta(days=1))[:-16], \
+                                           str(datetime.now() - timedelta(days=1))[:-16]
         info.id, info_id = message.chat.id, message.chat.id
         info.name, info_name = message.from_user.username, message.from_user.username
         db_sess.add(info)
@@ -42,10 +39,8 @@ def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     photo_choose_button = types.KeyboardButton("фото")
     album_button = types.KeyboardButton("альбом")
-    weather_button = types.KeyboardButton("погода")
-    game_button = types.KeyboardButton("игра")
     exp_button = types.KeyboardButton("мой опыт")
-    markup.add(photo_choose_button, album_button, weather_button, game_button, exp_button)
+    markup.add(photo_choose_button, album_button, exp_button)
     bot.send_message(message.chat.id, "выберите кнопку", reply_markup=markup)
 
 
@@ -64,8 +59,8 @@ def callback(message):
         info_time = params[3][1:-2]
     if len(params) == 0:
         info.exp, info_exp = 0, 0
-        info.daily_photo_time, info_time = str(datetime.datetime.now() - timedelta(days=1))[:-16], \
-                                           str(datetime.datetime.now() - timedelta(days=1))[:-16]
+        info.daily_photo_time, info_time = str(datetime.now() - timedelta(days=1))[:-16], \
+                                           str(datetime.now() - timedelta(days=1))[:-16]
         info.id, info_id = message.chat.id, message.chat.id
         info.name, info_name = message.from_user.username, message.from_user.username
         db_sess.add(info)
@@ -75,19 +70,12 @@ def callback(message):
         if message.text == 'фото':
             main_btns, photo_btns = False, True
             photo_msg(message)
-        elif message.text == 'погода':
-            main_btns, weather_btns = False, True
-            weather(message)
         elif message.text == 'альбом':
-            main_btns, album_btns,  = False, True
+            main_btns, album_btns, = False, True
             album(message)
         elif message.text == 'мой опыт':
             exp_call(info_exp, message)
-        elif message.text == 'игра':
-            main_btns, game_btns, = False, True
-            start_game(message)
-        else:
-            bot.send_message(message.chat.id, getwiki(message.text))
+
     elif album_btns:
         if message.text == 'кометы' or message.text.lower() in _comets or (
                 message.text.isdigit() and 0 <= int(message.text) - 1 < len(_comets) and comets_btn):
@@ -113,29 +101,12 @@ def callback(message):
             comets_btn, nebulae_btn, solar_btn, stars_btn, satellites_btn, main_btns, album_btns = \
                 False, False, False, False, False, True, False
             start(message)
-        else:
-            bot.send_message(message.chat.id, getwiki(message.text))
     elif photo_btns:
         if 'фото дня' in message.text:
             daily_photo_msg(message)
         elif message.text == '⬅назад':
             main_btns, photo_btns = True, False
             start(message)
-        else:
-            bot.send_message(message.chat.id, getwiki(message.text))
-    elif weather_btns:
-        if message.text.lower() == 'назад':
-            main_btns, weather_btns = True, False
-            start(message)
-        else:
-            findd(message)
-    elif game_btns:
-        if message.text.lower() == '⬅назад':
-            main_btns, weather_btns = True, False
-            start(message)
-
-        else:
-            user_answer(message)
 
 
 def exp_call(exp, message):
@@ -145,12 +116,12 @@ def exp_call(exp, message):
 def daily_photo_msg(message):
     global url_for_date, info_exp
     if message.text == 'фото дня':
-        url_for_date = f'{api_url}&date={datetime.datetime.now().strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={datetime.now().strftime("%Y-%m-%d")}'
         get_exp(message)
     elif message.text == 'вчерашнее фото дня':
-        url_for_date = f'{api_url}&date={(datetime.datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={(datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")}'
     elif message.text == 'позавчерашнее фото дня':
-        url_for_date = f'{api_url}&date={(datetime.datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")}'
+        url_for_date = f'{api_url}&date={(datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")}'
     try:
         response = requests.get(url_for_date)
         response.raise_for_status()
@@ -194,7 +165,7 @@ def image_send(explanation, message, title, url):
 
 def get_exp(message):
     global info_exp
-    time = datetime.datetime.now()
+    time = datetime.now()
     sort_time = [str(time)[:-16].split('-'), str(info_time).split('-')]
     res = sorted(sort_time, key=lambda x: (x[0], x[1], x[2]))
     if res[0] == str(info_time).split('-') and res[0] != res[1]:
